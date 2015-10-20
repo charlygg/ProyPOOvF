@@ -1,0 +1,146 @@
+------------------------------------------------------------------------------
+1.- revisar ren_tot
+posible solucion: esta tomando el textfield equivocado
+nuevo codigo: 
+int r = st.executeUpdate("Insert into Renta(ren_id, ren_fec, ren_per, ren_cli, ren_tot) values"+" ("
+					+Integer.parseInt(tf6.getText())+", '"
+					+fecha+"', "
+					+emp+", "
+					+cliente+", "
+					+Integer.parseInt(tf4.getText())+")");
+codigo antiguo:
+int r = st.executeUpdate("Insert into Renta(ren_id, ren_fec, ren_per, ren_cli, ren_tot) values"+" ("
+					+Integer.parseInt(tf6.getText())+", '"
+					+fecha+"', "
+					+emp+", "
+					+cliente+", "
+					+tot+")");
+
+error: por tipo de dato
+nuevo codigo: 
+					+tf4.getText()+")");					
+error corergido!! :D
+
+//////////////////////////////////////////////////////////////////////////////////
+
+2.- detalle de ventas nose guarda
+solucion: enviar a la tabla de detalle de ventas no de rentas
+nuevo codigo: 
+private void guardarDetallesVenta() {
+		trycatch();
+		try {
+			st = cn.createStatement();
+			@SuppressWarnings("unused")
+			int r = st.executeUpdate("Insert into Detvent(dtv_ven, dtv_pvt, dtv_sub) values("
+					+Integer.parseInt(tf6.getText())+", '"
+					+Integer.parseInt(tf1.getText())+"', "
+					+precio+")");	
+			cn.close();
+			tf2.setText("");
+		} catch (SQLException e1) {
+			e1.printStackTrace();	
+		}
+	}
+
+codigo antiguo:
+private void guardarDetallesVenta() {
+		trycatch();
+		try {
+			st = cn.createStatement();
+			@SuppressWarnings("unused")
+			int r = st.executeUpdate("Insert into Detren(drt_id, drt_rta, drt_ren) values("
+					+Integer.parseInt(tf6.getText())+", '"
+					+Integer.parseInt(tf1.getText())+"', "
+					+precio+")");	
+			cn.close();
+			tf2.setText("");
+		} catch (SQLException e1) {
+			e1.printStackTrace();	
+		}
+	}
+
+error, esperaba 1 parametro
+nuevo codigo:
+private void modificar() {
+		trycatch();
+		try {
+			st = cn.createStatement();
+			String updt = "Update Pvta set pvt_ven = 1 where pvt_id="+IDcopia;
+			@SuppressWarnings("unused")
+			int r = st.executeUpdate(updt);	
+			cn.close();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(rootPane, "ERROR: "+e1);
+		}
+	}
+	
+errores corregidos :D
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+3. cambiar tablas de corte de venta
+solucion: cambiar la tabla en el codigo
+nuevo codigo:
+try {
+			orden="dtv_ven";
+			st = cn.createStatement();
+			res = st.executeQuery("select * from Detvent order by "+orden);
+			while(res.next()){
+				String elemento=res.getString("dtv_ven")+"        "+res.getString("dtv_pvt")+"          "+res.getString("dtv_sub");
+				ta1.append(elemento+"\n");
+			}
+			cn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+problema solucionado
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+4. no registra copias
+solucion verificar el valor que regresa el jlist
+mje error: no puede guardar un entero como '1 '
+nuevo codigo: (clase referencias)
+if(dato == 1){
+			valor=value.trim().substring(0,2);
+			if(valor.equals("1 ")){
+				val=value.trim().substring(0,1);//estas 2 lineas
+				resultado = val;
+			} else {
+				dato = Integer.parseInt(valor);
+				System.out.println("debe ser mas de 10: "+dato);
+				if(dato > 9){
+					resultado = valor;
+				}
+			}
+		}
+		
+codigo antiguo:
+if(dato == 1){
+			valor=value.trim().substring(0,2);
+			if(valor.equals("1 ")){
+				resultado = valor;
+			} else {
+				dato = Integer.parseInt(valor);
+				System.out.println("debe ser mas de 10: "+dato);
+				if(dato > 9){
+					resultado = valor;
+				}
+			}
+		}
+corregido :D
+/////////////////////////////////////////////////////////////////////////////////////////////////
+5. Ingresa a rentas cuando el cliente no existe
+soluciones:
+a) tomar el texto de error del textarea
+*** no funciono
+b) tomar el valor de una variable booleana de clase
+*** tampoco funciono
+c) tome la variable booleana directa de la clase buscar
+*** solucionado :D
+///////////////////////////////////////////////////////////////////////////////////
+6. no permitir que se repita el user
+soluciones:
+a) identificar algun repetido por medio de codigo en java
+*** no supimos hacerlo
+b) no permitir duplicados en la base 
+*** ya no permite duplicados y marca el error pero se cierra la ventana
